@@ -1,5 +1,6 @@
 import sys
 import torch
+import torch.optim as optim
 import torch.nn as nn
 import unittest
 
@@ -10,6 +11,8 @@ from decoder import DecoderBlock
 from generator import Generator
 from discriminator import Discriminator
 from helper import helpers
+from adversarial_loss import AdversarialLoss
+from pixelwise_loss import PixelLoss
 
 
 class UnitTest(unittest.TestCase):
@@ -18,6 +21,9 @@ class UnitTest(unittest.TestCase):
         self.decoder = DecoderBlock()
         self.netG = Generator()
         self.netD = Discriminator()
+        self.init = helpers(
+            adam=True, SGD=False, beta1=0.5, beta2=0.999, momentum=0.9, lr=0.0002
+        )
 
     def test_encoder_block(self):
         in_channels = 3
@@ -120,6 +126,14 @@ class UnitTest(unittest.TestCase):
         self.assertEqual(
             self.netD(torch.randn(1, 3, 64, 64)).size(), torch.Size([1, 1, 8, 8])
         )
+
+    def test_helpers(self):
+        self.assertIsInstance(self.init["netG"], Generator)
+        self.assertIsInstance(self.init["netD"], Discriminator)
+        self.assertIsInstance(self.init["optimizerG"], optim.Adam)
+        self.assertIsInstance(self.init["optimizerD"], optim.Adam)
+        self.assertIsInstance(self.init["adversarial_loss"], AdversarialLoss)
+        self.assertIsInstance(self.init["pixelwise_loss"], PixelLoss)
 
 
 if __name__ == "__main__":
