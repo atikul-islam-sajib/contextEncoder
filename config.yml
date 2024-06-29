@@ -1,5 +1,25 @@
 path:
   ARTIFACTS_PATH: "./research/artifacts/"
 
-netG:
-  negative_slope: 0.2
+
+
+trainer:
+  name: "trainer"
+  adam: True
+  SGD: False
+  lr: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  momentum: 0.9
+  weight_decay: 0.001
+  epochs: 100
+  device: cuda                  # Can be used "cpu", "mps" as well
+  lr_scheduler: False
+  l1_regularization: False
+  l2_regularization: False
+  MLFlow: true
+
+tester:
+  model: None
+  dataloader: None              # Can be "train", "valid" as well
+  device: cuda                  # Can be used "mps" or "cuda" as well
