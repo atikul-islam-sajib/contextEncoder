@@ -127,6 +127,9 @@ class UnitTest(unittest.TestCase):
             self.netD(torch.randn(1, 3, 64, 64)).size(), torch.Size([1, 1, 8, 8])
         )
 
+    def test_netG_total_params(self):
+        self.assertEqual(Generator.total_params(self.netG), 40401059)
+
     def test_helpers(self):
         self.assertIsInstance(self.init["netG"], Generator)
         self.assertIsInstance(self.init["netD"], Discriminator)
