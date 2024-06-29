@@ -1,4 +1,5 @@
 import torch
+import argparse
 import torch.nn as nn
 
 
@@ -21,8 +22,20 @@ class AdversarialLoss(nn.Module):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Define the Adversarial Loss".capitalize()
+    )
 
-    loss = AdversarialLoss()
+    parser.add_argument(
+        "--reduction",
+        type=str,
+        default="mean",
+        help="Define the reduction method".capitalize(),
+    )
+
+    args = parser.parse_args()
+
+    loss = AdversarialLoss(reduction=args.reduction)
 
     predicted = torch.tensor([1.0, 0.0, 1.0, 0.0])
     actual = torch.tensor([1.0, 0.0, 1.0, 0.0])
