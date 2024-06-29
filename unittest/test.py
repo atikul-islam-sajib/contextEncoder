@@ -73,6 +73,44 @@ class UnitTest(unittest.TestCase):
             model(torch.randn(1, 3, 128, 128)).size(), torch.Size([1, 4000, 4, 4])
         )
 
+    def test_decoder_block(self):
+        in_channels = 4000
+        out_channels = 512
+        kernel_size = 4
+        stride = 2
+        padding = 1
+
+        layers = []
+
+        for _ in range(4):
+            layers.append(
+                DecoderBlock(
+                    in_channels=in_channels,
+                    out_channels=out_channels,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                )
+            )
+            in_channels = out_channels
+            out_channels = in_channels // 2
+
+        layers.append(
+            nn.ConvTranspose2d(
+                in_channels=in_channels,
+                out_channels=3,
+                kernel_size=kernel_size - 1,
+                stride=stride // stride,
+                padding=padding,
+            )
+        )
+
+        model = nn.Sequential(*layers)
+
+        self.assertEqual(
+            model(torch.randn(1, 4000, 4, 4)).size(), torch.Size([1, 3, 64, 64])
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
