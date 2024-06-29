@@ -130,6 +130,9 @@ class UnitTest(unittest.TestCase):
     def test_netG_total_params(self):
         self.assertEqual(Generator.total_params(self.netG), 40401059)
 
+    def test_netD_total_params(self):
+        self.assertEqual(Discriminator.total_params(self.netD), 1555585)
+
     def test_helpers(self):
         self.assertIsInstance(self.init["netG"], Generator)
         self.assertIsInstance(self.init["netD"], Discriminator)
