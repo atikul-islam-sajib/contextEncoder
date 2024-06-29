@@ -116,6 +116,11 @@ class UnitTest(unittest.TestCase):
             self.netG(torch.randn(1, 3, 128, 128)).size(), torch.Size([1, 3, 64, 64])
         )
 
+    def test_netD_size(self):
+        self.assertEqual(
+            self.netD(torch.randn(1, 3, 64, 64)).size(), torch.Size([1, 1, 8, 8])
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
