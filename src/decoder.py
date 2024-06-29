@@ -1,5 +1,9 @@
+import sys
+import argparse
 import torch
 import torch.nn as nn
+
+sys.path.append("src/")
 
 
 class DecoderBlock(nn.Module):
@@ -43,13 +47,30 @@ class DecoderBlock(nn.Module):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Decoder block for the ContextEncoder".title()
+    )
+    parser.add_argument(
+        "--in_channels", type=int, default=4000, help="Input channels".capitalize()
+    )
+    parser.add_argument(
+        "--out_channels", type=int, default=512, help="Output channels".capitalize()
+    )
+    parser.add_argument(
+        "--kernel_size", type=int, default=4, help="Kernel size".capitalize()
+    )
+    parser.add_argument("--stride", type=int, default=2, help="Stride".capitalize())
+    parser.add_argument("--padding", type=int, default=1, help="Padding".capitalize())
+
     layers = []
 
-    in_channels = 4000
-    out_channels = 512
-    kernel_size = 4
-    stride = 2
-    padding = 1
+    args = parser.parse_args()
+
+    in_channels = args.in_channels
+    out_channels = args.out_channels
+    kernel_size = args.kernel_size
+    stride = args.stride
+    padding = args.padding
 
     for _ in range(4):
         layers.append(
@@ -76,4 +97,4 @@ if __name__ == "__main__":
 
     model = nn.Sequential(*layers)
 
-    print(model(torch.randn(1, 4000, 4, 4)).size())
+    assert model(torch.randn(1, 4000, 4, 4)).size() == (1, 3, 64, 64)
