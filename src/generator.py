@@ -1,6 +1,7 @@
 import os
 import sys
 import torch
+import traceback
 import argparse
 import torch.nn as nn
 from torchsummary import summary
@@ -9,6 +10,7 @@ from torchview import draw_graph
 
 sys.path.append("src/")
 
+from utils import config
 from encoder import EncoderBlock
 from decoder import DecoderBlock
 
@@ -120,8 +122,24 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.netG:
-        netG = Generator()
+        try:
+            netG = Generator()
 
-        assert netG(torch.randn(1, 3, 128, 128)).size() == (1, 3, 64, 64)
+            assert netG(torch.randn(1, 3, 128, 128)).size() == (1, 3, 64, 64)
+
+        except ValueError as e:
+            print("Error in the model definition".capitalize())
+            traceback.print_exc()
+        except Exception as e:
+            print("An error is occured {}".format(e))
+            traceback.print_exc()
 
         print(summary(model=netG, input_size=(3, 128, 128)))
+
+        draw_graph(
+            model=netG,
+            input_data=torch.randn(1, 3, 128, 128),
+        ).visual_graph.render(
+            filename=os.path.join(config()["path"]["ARTIFACTS_PATH"], "netG"),
+            format="png",
+        )
