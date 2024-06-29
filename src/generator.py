@@ -1,7 +1,11 @@
 import os
 import sys
 import torch
+import argparse
 import torch.nn as nn
+from torchsummary import summary
+from torchview import draw_graph
+
 
 sys.path.append("src/")
 
@@ -94,8 +98,30 @@ class Generator(nn.Module):
         else:
             raise ValueError("Input should be in the format of the tensor".capitalize())
 
+    @staticmethod
+    def total_params(model):
+        if isinstance(model, Generator):
+            return sum(params.numel() for params in model.parameters())
+
+        else:
+            raise ValueError(
+                "Input should be in the format of the generator".capitalize()
+            )
+
 
 if __name__ == "__main__":
-    netG = Generator()
+    parser = argparse.ArgumentParser(
+        description="Generator for Context Encoder".title()
+    )
+    parser.add_argument(
+        "--netG", action="store_true", help="Define the netG model".capitalize()
+    )
 
-    print(netG(torch.randn(1, 3, 128, 128)).size())
+    args = parser.parse_args()
+
+    if args.netG:
+        netG = Generator()
+
+        assert netG(torch.randn(1, 3, 128, 128)).size() == (1, 3, 64, 64)
+
+        print(summary(model=netG, input_size=(3, 128, 128)))

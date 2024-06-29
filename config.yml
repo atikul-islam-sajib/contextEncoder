@@ -1,4 +1,5 @@
-
+path:
+  ARTIFACTS_PATH: "./research/artifacts/"
 
 netG:
   negative_slope: 0.2
