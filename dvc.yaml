@@ -16,10 +16,24 @@ stages:
       - src/trainer.py
       - ./config.yml
       - ./data
+    # outs:
+    #   - ./checkpoints/:
+    #       persist: True
+    #   - ./research/:
+    #       persist: True
+    #   - ./outputs/:
+    #       persist: True
+
+  test:
+    cmd: python src/cli.py --test
+    deps:
+      - src/cli.py
+      - src/tester.py
+      - src/utils.py
+      - src/helper.py
+      - ./config.yml
+      - ./checkpoints/
+
     outs:
-      - ./checkpoints/:
-        persist: True
-      - ./research/:
-        persist: True
       - ./outputs/:
-        persist: True
+          persist: True

@@ -1,0 +1,89 @@
+schema: '2.0'
+stages:
+  valid:
+    cmd: python src/cli.py --test
+    deps:
+    - path: ./config.yml
+      hash: md5
+      md5: 22a8028a25a53a543c097705828c3820
+      size: 1814
+    - path: src/cli.py
+      hash: md5
+      md5: 01e69eb1873d7bea0fcef903ff662e33
+      size: 6446
+  train:
+    cmd: python src/cli.py --train
+    deps:
+    - path: ./config.yml
+      hash: md5
+      md5: 22a8028a25a53a543c097705828c3820
+      size: 1814
+    - path: ./data
+      hash: md5
+      md5: a260a28694073e9dc29b420979c599f6.dir
+      size: 20173965
+      nfiles: 44
+    - path: src/adversarial_loss.py
+      hash: md5
+      md5: 38dbe04a2d6d401fb621b23324de075b
+      size: 1098
+    - path: src/cli.py
+      hash: md5
+      md5: 01e69eb1873d7bea0fcef903ff662e33
+      size: 6446
+    - path: src/dataloader.py
+      hash: md5
+      md5: ec2ef404f2464b04351f90fa78d935fa
+      size: 9347
+    - path: src/decoder.py
+      hash: md5
+      md5: 94640f02db90230047da2425bedb0376
+      size: 2791
+    - path: src/discriminator.py
+      hash: md5
+      md5: b2b2aaddb215fa1df460392ded72bcef
+      size: 2851
+    - path: src/discriminator_block.py
+      hash: md5
+      md5: 6aeef860daae3b1264079b044b699091
+      size: 3180
+    - path: src/encoder.py
+      hash: md5
+      md5: 8fb639358bb366a4d00006e3a297f235
+      size: 3639
+    - path: src/generator.py
+      hash: md5
+      md5: a21c46e64f61d30502266fe1f7f46faf
+      size: 4052
+    - path: src/helper.py
+      hash: md5
+      md5: 9cba12b5219e742d955b1ddfa84fa464
+      size: 3169
+    - path: src/pixelwise_loss.py
+      hash: md5
+      md5: 047bfd23081a5c7c7fb01a6a5c1edb79
+      size: 1071
+    - path: src/trainer.py
+      hash: md5
+      md5: a155a8f40c4b3b1849fbd2d56b4ec04a
+      size: 17254
+    - path: src/utils.py
+      hash: md5
+      md5: 44b325b218b59b798196f26b1b1c733b
+      size: 1280
+  test:
+    cmd: python src/cli.py --test
+    deps:
+    - path: ./checkpoints/
+      hash: md5
+      md5: 357126da290e75730e548b5c9f47843c.dir
+      size: 80980434210
+      nfiles: 503
+    - path: ./config.yml
+      hash: md5
+      md5: 22a8028a25a53a543c097705828c3820
+      size: 1814
+    - path: src/cli.py
+      hash: md5
+      md5: 01e69eb1873d7bea0fcef903ff662e33
+      size: 6446

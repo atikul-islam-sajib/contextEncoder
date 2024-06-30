@@ -6,12 +6,13 @@ path:
   BEST_MODEL_PATH: "./checkpoints/best_model/"
   METRCIS_PATH: "./outputs/metrics/"
   SAVE_IMAGE_PATH: "./outputs/train_images/"
+  SAVE_TEST_IMAGE_PATH: "./outputs/test_images/"
 
 dataloader:
   image_path: "./data/raw/dataset.zip"
-  image_size: 128            # Pape suggested to use 128, try to use different like 256, 512, 1024 as well
+  image_size: 128            # Paper suggested to use 128, try to use different like 256, 512, 1024 as well
   channels: 3
-  batch_size: 4
+  batch_size: 4              # Paper suggested to use 8, try to use different like 1, 16, 32, 64 as well
   split_size: 0.30
 
 trainer:
@@ -23,13 +24,13 @@ trainer:
   beta2: 0.999                 # Used in the Adam optimizer
   momentum: 0.9                # Used for SGD optimizer
   weight_decay: 0.0001         # Used for Adam optimizer
-  epochs: 100
+  epochs: 5
   adversarial_lambda: 0.001    # Lmbda value added in the netG
   pixelwise_lambda: 0.999      # Lmbda value added in the netG
-  steps: 10
+  steps: 100
   step_size: 10                # Used for learning rate scheduler
   gamma: 0.5                   # Used for learning rate scheduler
-  device: mps                 # Can be used "cpu", "mps" as well
+  device: mps                  # Can be used "cpu", "mps" as well
   lr_scheduler: False          # Used StepLR
   l1_regularization: False
   l2_regularization: False
@@ -38,6 +39,6 @@ trainer:
   is_weight_init: True
 
 tester:
-  model: None
-  dataloader: None             # Can be "train", "valid" as well
-  device: cuda                 # Can be used "mps" or "cuda" as well
+  model: best                  # Define the model as "best" or select the model from chackpoints
+  dataloader: train            # Can be "train", "valid" as well
+  device: mps                  # Can be used "mps" or "cuda" as well

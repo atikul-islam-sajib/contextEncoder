@@ -7,6 +7,7 @@ from utils import config
 
 from dataloader import Loader
 from trainer import Trainer
+from tester import Tester
 
 
 def cli():
@@ -156,6 +157,19 @@ def cli():
         help="Initialize weights".capitalize(),
     )
     parser.add_argument(
+        "--model",
+        type=str,
+        default=config()["tester"]["model"],
+        help="Define the model for further analysis".capitalize(),
+    )
+    parser.add_argument(
+        "--dataloader",
+        type=str,
+        default=config()["tester"]["dataloader"],
+        help="Define the dataloader for further analysis".capitalize(),
+    )
+
+    parser.add_argument(
         "--train", action="store_true", help="Train the model".capitalize()
     )
     parser.add_argument(
@@ -204,6 +218,10 @@ def cli():
         )
 
         trainer.train()
+
+    if args.test:
+        test = Tester(model=args.model, device=args.device, dataloader=args.dataloader)
+        test.plot()
 
 
 if __name__ == "__main__":
