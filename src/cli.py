@@ -6,8 +6,6 @@ sys.path.append("src/")
 from utils import config
 
 from dataloader import Loader
-from generator import Generator
-from discriminator import Discriminator
 from trainer import Trainer
 
 
