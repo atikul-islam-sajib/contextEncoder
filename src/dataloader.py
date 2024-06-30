@@ -1,9 +1,11 @@
 import os
 import sys
 import cv2
+import pandas as pd
 import zipfile
 import traceback
 import torch
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 from PIL import Image
 from torchvision import transforms
@@ -147,7 +149,7 @@ class Loader:
         )
         test_dataloader = DataLoader(
             dataset=list(zip(dataset["X_test"], dataset["y_test"])),
-            batch_size=self.batch_size,
+            batch_size=self.batch_size * 8,
             shuffle=True,
         )
 
@@ -168,15 +170,85 @@ class Loader:
             )
         )
 
+    @staticmethod
+    def dataset_details():
+        processed_path = config()["path"]["PROCESSED_DATA_PATH"]
+        artifacts_path = config()["path"]["ARTIFACTS_PATH"]
+
+        if os.path.exists(processed_path):
+            train_dataloader = load(
+                filename=os.path.join(processed_path, "train_dataloader.pkl")
+            )
+            valid_dataloader = load(
+                filename=os.path.join(processed_path, "test_dataloader.pkl")
+            )
+
+            train_data, train_label = next(iter(train_dataloader))
+            valid_data, valid_label = next(iter(valid_dataloader))
+
+            pd.DataFrame(
+                {
+                    "total_data_points": (sum(X.size(0) for X, _ in train_dataloader))
+                    + sum(X.size(0) for X, _ in valid_dataloader),
+                    "train_data_points": sum(X.size(0) for X, _ in train_dataloader),
+                    "valid_data_points": sum(X.size(0) for X, _ in valid_dataloader),
+                    "train_image_size(X)": str(train_data.size()),
+                    "valid_image_size(X)": str(valid_data.size()),
+                    "train_image_size(y)": str(train_label.size()),
+                    "valid_image_size(y)": str(valid_label.size()),
+                },
+                index=["Quantity"],
+            ).to_csv(os.path.join(artifacts_path, "dataset_details.csv"))
+
+    @staticmethod
+    def plot_images():
+        processed_path = config()["path"]["PROCESSED_DATA_PATH"]
+        artifacts_path = config()["path"]["ARTIFACTS_PATH"]
+
+        train_dataloader = load(os.path.join(processed_path, "test_dataloader.pkl"))
+        data, label = next(iter(train_dataloader))
+
+        number_of_rows = data.size(0) // 2
+        number_of_columns = data.size(0) // number_of_rows
+
+        print(number_of_rows, number_of_columns)
+
+        plt.figure(figsize=(20, 10))
+
+        for index, image in enumerate(data):
+            X = image.permute(1, 2, 0).detach().numpy()
+            X = (X - X.min()) / (X.max() - X.min())
+
+            y = label[index].permute(1, 2, 0).detach().numpy()
+            y = (y - y.min()) / (y.max() - y.min())
+
+            plt.subplot(2 * number_of_rows, 2 * number_of_columns, 2 * index + 1)
+            plt.imshow(X)
+            plt.title("X")
+            plt.axis("off")
+
+            plt.subplot(2 * number_of_rows, 2 * number_of_columns, 2 * index + 2)
+            plt.imshow(y)
+            plt.title("y")
+            plt.axis("off")
+
+        plt.tight_layout()
+        plt.savefig(os.path.join(artifacts_path, "images.png"))
+        plt.show()
+
+        print("Image is saved in the folder of {}".format(artifacts_path))
+
 
 if __name__ == "__main__":
     loader = Loader(
         image_path="./data/raw/dataset.zip",
         channels=3,
         batch_size=1,
-        split_size=0.25,
+        split_size=0.10,
     )
 
-    # loader.unzip_folder()
-    # loader.feature_extractor()
+    loader.unzip_folder()
+    loader.feature_extractor()
     loader.create_dataloader()
+    Loader.dataset_details()
+    Loader.plot_images()
