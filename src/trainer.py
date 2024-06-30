@@ -1,24 +1,22 @@
 import os
 import sys
-import argparse
-import mlflow
 import torch
+import mlflow
+import argparse
 import warnings
-import numpy as np
-import torch.nn as nn
 import traceback
+import numpy as np
 from tqdm import tqdm
+from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR
-from torchvision.utils import save_image
 
 warnings.filterwarnings("ignore")
 
 sys.path.append("src/")
 
-from dataloader import Loader
 from helper import helpers
-from utils import config, dump, load, device_init, weight_init, CustomException
+from utils import config, dump, device_init, weight_init, CustomException
 
 
 class Trainer:

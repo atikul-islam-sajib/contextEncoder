@@ -27,9 +27,9 @@ trainer:
   adversarial_lambda: 0.0001
   pixelwise_lambda: 0.999
   steps: 50
-  step_size: 10
-  gamma: 0.5
-  device: mps                  # Can be used "cpu", "mps" as well
+  step_size: 10                # Used for learning rate scheduler
+  gamma: 0.5                   # Used for learning rate scheduler
+  device: cuda                 # Can be used "cpu", "mps" as well
   lr_scheduler: False
   l1_regularization: False
   l2_regularization: False
