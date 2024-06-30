@@ -24,7 +24,9 @@ trainer:
   lr_scheduler: False
   l1_regularization: False
   l2_regularization: False
-  MLFlow: true
+  MLFlow: True
+  display: True
+  is_weight_init: True
 
 tester:
   model: None
