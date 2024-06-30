@@ -13,7 +13,7 @@ class AdversarialLoss(nn.Module):
         if (isinstance(pred, torch.Tensor)) and (isinstance(actual, torch.Tensor)):
             self.loss = nn.MSELoss(reduction=self.reduction)
 
-            return self.loss(predicted, actual)
+            return self.loss(pred, actual)
 
         else:
             raise ValueError(

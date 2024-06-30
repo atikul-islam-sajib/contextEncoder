@@ -1,6 +1,10 @@
 import os
 import sys
+import torch
+import numpy as np
+import torch.nn as nn
 import traceback
+from tqdm import tqdm
 from torch.utils.data import DataLoader
 
 sys.path.append("src/")
@@ -94,6 +98,66 @@ class Trainer:
             self.netG.to(self.device)
             self.netD.to(self.device)
 
+    def update_netG(self, **kwargs):
+        self.optimizerG.zero_grad()
+
+        X = kwargs["X"]
+        y = kwargs["y"]
+
+        generated_inpaint = self.netG(X)
+        predicted_inpaint = self.netD(generated_inpaint)
+        predicted_inpaint_loss = self.adversarial_loss(
+            predicted_inpaint, torch.ones_like(predicted_inpaint)
+        )
+
+        pixelwise_loss = self.pixelwise_loss(generated_inpaint, y)
+
+        total_netG_loss = 0.001 * predicted_inpaint_loss + 0.999 * pixelwise_loss
+
+        total_netG_loss.backward()
+        self.optimizerG.step()
+
+        return total_netG_loss.item()
+
+    def update_netD(self, **kwargs):
+        self.optimizerD.zero_grad()
+
+        X = kwargs["X"]
+        y = kwargs["y"]
+
+        generated_inpaint = self.netG(X)
+        predicted_inpaint = self.netD(generated_inpaint)
+        predicted_inpaint_loss = self.adversarial_loss(
+            predicted_inpaint, torch.zeros_like(predicted_inpaint)
+        )
+
+        predicted_real = self.netD(y)
+        predicted_real_loss = self.adversarial_loss(
+            predicted_real, torch.ones_like(predicted_real)
+        )
+
+        total_netD_loss = 0.5 * (predicted_inpaint_loss + predicted_real_loss)
+
+        total_netD_loss.backward()
+        self.optimizerD.step()
+
+        return total_netD_loss.item()
+
+    def train(self):
+        for epoch in tqdm(range(self.epochs)):
+            self.netG_loss = []
+            self.netD_loss = []
+
+            for index, (X, y) in enumerate(self.train_dataloader):
+                X = X.to(self.device)
+                y = y.to(self.device)
+
+                self.netD_loss.append(self.update_netD(X=X, y=y))
+                self.netG_loss.append(self.update_netG(X=X, y=y))
+
+            print(np.mean(self.netD_loss), np.mean(self.netG_loss))
+
 
 if __name__ == "__main__":
-    trainer = Trainer()
+    trainer = Trainer(epochs=1, device="mps")
+    trainer.train()
