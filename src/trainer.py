@@ -343,7 +343,7 @@ class Trainer:
                         "weight_decay": self.weight_decay,
                         "momentum": self.momentum,
                         "adversarial_lambda": self.adversarial_lambda,
-                        "pixelwise_lamda": self.pixelwise_lamda,
+                        "pixelwise_lamda": self.pixelwise_lambda,
                         "steps": self.steps,
                         "step_size": self.step_size,
                         "gamma": self.gamma,
