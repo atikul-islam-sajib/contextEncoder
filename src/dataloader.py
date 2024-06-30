@@ -1,16 +1,16 @@
 import os
 import sys
 import cv2
-import pandas as pd
 import zipfile
+import argparse
 import traceback
-import torch
-import matplotlib.pyplot as plt
+import pandas as pd
 from tqdm import tqdm
 from PIL import Image
+import matplotlib.pyplot as plt
 from torchvision import transforms
-from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
+from sklearn.model_selection import train_test_split
 
 sys.path.append("src/")
 
@@ -211,8 +211,6 @@ class Loader:
         number_of_rows = data.size(0) // 2
         number_of_columns = data.size(0) // number_of_rows
 
-        print(number_of_rows, number_of_columns)
-
         plt.figure(figsize=(20, 10))
 
         for index, image in enumerate(data):
@@ -240,15 +238,45 @@ class Loader:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Dataloader class for context Loader".title()
+    )
+    parser.add_argument(
+        "--image_path",
+        type=str,
+        default=config()["dataloader"]["image_path"],
+        help="Define the dataset".capitalize(),
+    )
+    parser.add_argument(
+        "--channels",
+        type=int,
+        default=config()["dataloader"]["channels"],
+        help="Define the number of channels".capitalize(),
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=config()["dataloader"]["batch_size"],
+        help="Define the batch size".capitalize(),
+    )
+    parser.add_argument(
+        "--split_size",
+        type=float,
+        default=config()["dataloader"]["split_size"],
+        help="Define the split size".capitalize(),
+    )
+    args = parser.parse_args()
+
     loader = Loader(
-        image_path="./data/raw/dataset.zip",
-        channels=3,
-        batch_size=1,
-        split_size=0.10,
+        image_path=args.image_path,
+        channels=args.channels,
+        batch_size=args.batch_size,
+        split_size=args.split_size,
     )
 
     loader.unzip_folder()
     loader.feature_extractor()
     loader.create_dataloader()
+
     Loader.dataset_details()
     Loader.plot_images()
