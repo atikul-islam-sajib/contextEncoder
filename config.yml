@@ -12,7 +12,7 @@ dataloader:
   image_size: 128            # Pape suggested to use 128, try to use different like 256, 512, 1024 as well
   channels: 3
   batch_size: 1
-  split_size: 0.30
+  split_size: 0.20
 
 trainer:
   name: "trainer"

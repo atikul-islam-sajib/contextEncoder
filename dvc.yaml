@@ -1,0 +1,25 @@
+stages:
+  train:
+    cmd: python src/cli.py --train
+    deps:
+      - src/cli.py
+      - src/dataloader.py
+      - src/encoder.py
+      - src/decoder.py
+      - src/generator.py
+      - src/discriminator_block.py
+      - src/discriminator.py
+      - src/adversarial_loss.py
+      - src/pixelwise_loss.py
+      - src/helper.py
+      - src/utils.py
+      - src/trainer.py
+      - ./config.yml
+      - ./data
+    outs:
+      - ./checkpoints/:
+        persist: True
+      - ./research/:
+        persist: True
+      - ./outputs/:
+        persist: True
