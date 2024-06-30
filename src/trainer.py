@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 import mlflow
 import torch
 import warnings
@@ -384,6 +385,7 @@ class Trainer:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Trainer for Context Encoder".title())
     trainer = Trainer(
         epochs=100,
         lr=0.0002,
