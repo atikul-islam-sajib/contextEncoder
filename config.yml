@@ -11,8 +11,8 @@ dataloader:
   image_path: "./data/raw/dataset.zip"
   image_size: 128            # Pape suggested to use 128, try to use different like 256, 512, 1024 as well
   channels: 3
-  batch_size: 1
-  split_size: 0.20
+  batch_size: 4
+  split_size: 0.30
 
 trainer:
   name: "trainer"
@@ -23,14 +23,13 @@ trainer:
   beta2: 0.999                 # Used in the Adam optimizer
   momentum: 0.9                # Used for SGD optimizer
   weight_decay: 0.0001         # Used for Adam optimizer
-  weight_decay: 0.001          # Used for Adam optimizer
   epochs: 100
   adversarial_lambda: 0.001    # Lmbda value added in the netG
   pixelwise_lambda: 0.999      # Lmbda value added in the netG
-  steps: 50
+  steps: 10
   step_size: 10                # Used for learning rate scheduler
   gamma: 0.5                   # Used for learning rate scheduler
-  device: cuda                 # Can be used "cpu", "mps" as well
+  device: mps                 # Can be used "cpu", "mps" as well
   lr_scheduler: False          # Used StepLR
   l1_regularization: False
   l2_regularization: False
