@@ -1,14 +1,33 @@
+import os
 import sys
 import torch
 import traceback
 import torch.optim as optim
+from torch.utils.data import DataLoader
 
 sys.path.append("src/")
 
+from utils import config, load, CustomException
+from dataloader import Loader
 from generator import Generator
 from discriminator import Discriminator
 from adversarial_loss import AdversarialLoss
 from pixelwise_loss import PixelLoss
+
+
+def load_dataloader():
+    processed_path = config()["path"]["PROCESSED_DATA_PATH"]
+
+    if os.path.exists(processed_path):
+        train_dataloader = load(os.path.join(processed_path, "train_dataloader.pkl"))
+        valid_dataloader = load(os.path.join(processed_path, "test_dataloader.pkl"))
+
+        return {
+            "train_dataloader": train_dataloader,
+            "valid_dataloader": valid_dataloader,
+        }
+    else:
+        raise CustomException("Cannot import the dataloader".capitalize())
 
 
 def helpers(**kwargs):
@@ -42,7 +61,20 @@ def helpers(**kwargs):
     adversarial_loss = AdversarialLoss(reduction="mean")
     pixelwise_loss = PixelLoss(reduction="mean")
 
+    try:
+        dataloader = load_dataloader()
+
+    except CustomException as e:
+        print("An error is occured {}".format(e))
+        traceback.print_exc()
+
+    except Exception as e:
+        print("An error is occured {}".format(e))
+        traceback.print_exc()
+
     return {
+        "train_dataloader": dataloader["train_dataloader"],
+        "valid_dataloader": dataloader["valid_dataloader"],
         "netG": netG,
         "netD": netD,
         "optimizerG": optimizerG,
@@ -56,6 +88,9 @@ if __name__ == "__main__":
     init = helpers(
         adam=True, SGD=False, beta1=0.5, beta2=0.999, momentum=0.9, lr=0.0002
     )
+
+    assert init["train_dataloader"].__class__.__name__ == DataLoader.__name__
+    assert init["valid_dataloader"].__class__.__name__ == DataLoader.__name__
 
     assert init["netG"].__class__.__name__ == "Generator"
     assert init["netD"].__class__.__name__ == "Discriminator"

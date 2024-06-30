@@ -45,3 +45,9 @@ def weight_init(m):
 def config():
     with open("./config.yml", "r") as file:
         return yaml.safe_load(file)
+
+
+class CustomException(Exception):
+    def __init__(self, message=None):
+        if message is not None:
+            return message
