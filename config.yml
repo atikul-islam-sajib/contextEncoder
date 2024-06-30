@@ -2,6 +2,10 @@ path:
   RAW_DATA_PATH: "./data/raw/"
   PROCESSED_DATA_PATH: "./data/processed/"
   ARTIFACTS_PATH: "./research/artifacts/"
+  TRAIN_MODELS_PATH: "./checkpoints/train_models/"
+  BEST_MODEL_PATH: "./checkpoints/best_model/"
+  METRCIS_PATH: "./outputs/metrics/"
+  SAVE_IMAGE_PATH: "./outputs/train_images/"
 
 dataloader:
   image_path: "./data/raw/dataset.zip"
@@ -20,6 +24,11 @@ trainer:
   momentum: 0.9
   weight_decay: 0.001
   epochs: 100
+  adversarial_lambda: 0.0001
+  pixelwise_lambda: 0.999
+  steps: 10
+  steps_size: 10
+  gamma: 0.5
   device: cuda                  # Can be used "cpu", "mps" as well
   lr_scheduler: False
   l1_regularization: False
