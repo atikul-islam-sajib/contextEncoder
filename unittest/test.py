@@ -3,6 +3,7 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import unittest
+from torch.utils.data import DataLoader
 
 sys.path.append("src/")
 
@@ -140,6 +141,8 @@ class UnitTest(unittest.TestCase):
         self.assertIsInstance(self.init["optimizerD"], optim.Adam)
         self.assertIsInstance(self.init["adversarial_loss"], AdversarialLoss)
         self.assertIsInstance(self.init["pixelwise_loss"], PixelLoss)
+        self.assertIsInstance(self.init["train_dataloader"], DataLoader.__name__)
+        self.assertIsInstance(self.init["valid_dataloader"], DataLoader.__name__)
 
 
 if __name__ == "__main__":
