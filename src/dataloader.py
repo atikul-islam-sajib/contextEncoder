@@ -274,7 +274,7 @@ if __name__ == "__main__":
         split_size=args.split_size,
     )
 
-    loader.unzip_folder()
+    # loader.unzip_folder()
     loader.feature_extractor()
     loader.create_dataloader()
 

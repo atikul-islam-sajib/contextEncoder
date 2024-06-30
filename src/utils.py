@@ -32,7 +32,7 @@ def device_init(device="cuda"):
 
 
 def weight_init(m):
-    classname = m.__class__
+    classname = m.__class__.__name__
 
     if classname.find("Conv") != -1:
         nn.init.normal_(m.weight.data, 0.0, 0.02)
