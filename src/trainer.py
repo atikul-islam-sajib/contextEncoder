@@ -1,5 +1,6 @@
 import os
 import sys
+import mlflow
 import torch
 import warnings
 import numpy as np
@@ -38,6 +39,7 @@ class Trainer:
         SGD=False,
         l1_regularization=False,
         l2_regularization=False,
+        elasticnet_regularization=False,
         lr_scheduler=False,
         MLFlow=True,
         display=True,
@@ -54,6 +56,7 @@ class Trainer:
         self.SGD = SGD
         self.l1_regularization = l1_regularization
         self.l2_regularization = l2_regularization
+        self.elasticnet_regularization = elasticnet_regularization
         self.lr_scheduler = lr_scheduler
         self.MLFlow = MLFlow
         self.display = display
@@ -131,7 +134,7 @@ class Trainer:
             self.total_netD_loss = []
             self.history = {"netG_loss": [], "netD_loss": []}
 
-    def l1_regularization(self, model=None, value=0.01):
+    def l1_regularizer(self, model=None, value=0.01):
         if model is not None:
             return value * sum(torch.norm(params, 1) for params in model.parameters())
         else:
@@ -139,7 +142,7 @@ class Trainer:
                 "Elastic net cannot be possible for regularization".capitalize()
             )
 
-    def l2_regularization(self, model=None, value=0.001):
+    def l2_regularizer(self, model=None, value=0.001):
         if model is not None:
             return value * sum(torch.norm(params, 2) for params in model.parameters())
         else:
@@ -147,7 +150,7 @@ class Trainer:
                 "Elastic net cannot be possible for regularization".capitalize()
             )
 
-    def elasticnet_regularization(self, model=None, value=0.001):
+    def elasticnet_regularizer(self, model=None, value=0.001):
         if model is not None:
             self.l1 = self.l1_regularization(model=model, value=value)
             self.l2 = self.l2_regularization(model=model, value=value)
@@ -179,13 +182,13 @@ class Trainer:
         )
 
         if self.l1_regularization:
-            total_netG_loss += self.l1_regularization(model=self.netG)
+            total_netG_loss += self.l1_regularizer(model=self.netG)
 
         if self.l2_regularization:
-            total_netG_loss += self.l2_regularization(model=self.netG)
+            total_netG_loss += self.l2_regularizer(model=self.netG)
 
         if self.elasticnet_regularization:
-            total_netG_loss += self.elasticnet_regularization(model=self.netG)
+            total_netG_loss += self.elasticnet_regularizer(model=self.netG)
 
         total_netG_loss.backward()
         self.optimizerG.step()
@@ -212,13 +215,13 @@ class Trainer:
         total_netD_loss = 0.5 * (predicted_inpaint_loss + predicted_real_loss)
 
         if self.l1_regularization:
-            total_netD_loss += self.l1_regularization(model=self.netD)
+            total_netD_loss += self.l1_regularizer(model=self.netD)
 
         if self.l1_regularization:
-            total_netD_loss += self.l2_regularization(model=self.netD)
+            total_netD_loss += self.l2_regularizer(model=self.netD)
 
         if self.elasticnet_regularization:
-            total_netD_loss += self.elasticnet_regularization(model=self.netD)
+            total_netD_loss += self.elasticnet_regularizer(model=self.netD)
 
         total_netD_loss.backward()
         self.optimizerD.step()
@@ -275,66 +278,133 @@ class Trainer:
             )
 
     def train(self):
-        for epoch in tqdm(range(self.epochs)):
-            self.netG_loss = []
-            self.netD_loss = []
+        with mlflow.start_run(
+            description="Context Encoders: Feature Learning by Inpainting Context Encoders for Inpainting & Self-Supervised Learning("
+        ) as run:
+            for epoch in tqdm(range(self.epochs)):
+                self.netG_loss = []
+                self.netD_loss = []
 
-            for _, (X, y) in enumerate(self.train_dataloader):
-                X = X.to(self.device)
-                y = y.to(self.device)
+                for _, (X, y) in enumerate(self.train_dataloader):
+                    X = X.to(self.device)
+                    y = y.to(self.device)
 
-                self.netD_loss.append(self.update_netD(X=X, y=y))
-                self.netG_loss.append(self.update_netG(X=X, y=y))
+                    self.netD_loss.append(self.update_netD(X=X, y=y))
+                    self.netG_loss.append(self.update_netG(X=X, y=y))
 
-            if self.lr_scheduler:
-                self.schedulerG.step()
-                self.schedulerD.step()
+                if self.lr_scheduler:
+                    self.schedulerG.step()
+                    self.schedulerD.step()
 
-            self.show_progress(
-                netG_loss=np.mean(self.netG_loss),
-                netD_loss=np.mean(self.netD_loss),
-                epoch=epoch + 1,
+                self.show_progress(
+                    netG_loss=np.mean(self.netG_loss),
+                    netD_loss=np.mean(self.netD_loss),
+                    epoch=epoch + 1,
+                )
+
+                try:
+                    self.saved_checkpoints(
+                        netG_loss=np.mean(self.netG_loss), epoch=epoch + 1
+                    )
+                except CustomException as e:
+                    print(e)
+                    traceback.print_exc()
+
+                except Exception as e:
+                    print(e)
+                    traceback.print_exc()
+
+                if (epoch + 1) % self.steps == 0:
+                    X, y = next(iter(self.train_dataloader))
+                    X = X.to(self.device)
+                    y = y.to(self.device)
+
+                    predicted_impaint = self.netG(X)
+
+                    save_image(
+                        predicted_impaint,
+                        os.path.join(
+                            config()["path"]["SAVE_IMAGE_PATH"],
+                            "image{}.png".format(epoch + 1),
+                        ),
+                        nrow=1,
+                    )
+
+                self.history["netG_loss"].append(np.mean(self.netG_loss))
+                self.history["netD_loss"].append(np.mean(self.netD_loss))
+
+                mlflow.log_params(
+                    {
+                        "epochs": self.epochs,
+                        "lr": self.lr,
+                        "beta1": self.beta1,
+                        "beta2": self.beta2,
+                        "weight_decay": self.weight_decay,
+                        "momentum": self.momentum,
+                        "adversarial_lambda": self.adversarial_lambda,
+                        "pixelwise_lamda": self.pixelwise_lamda,
+                        "steps": self.steps,
+                        "step_size": self.step_size,
+                        "gamma": self.gamma,
+                        "device": self.device,
+                        "adam": self.adam,
+                        "SGD": self.SGD,
+                        "l1_regularization": self.l1_regularization,
+                        "l2_regularization": self.l2_regularization,
+                        "lr_scheduler": self.lr_scheduler,
+                        "MLFlow": self.MLFlow,
+                        "display": self.display,
+                        "is_weight_init": self.is_weight_init,
+                    }
+                )
+
+                mlflow.log_metric(
+                    key="netG_loss", value=np.mean(self.netG_loss), step=epoch + 1
+                )
+                mlflow.log_metric(
+                    key="netD_loss", value=np.mean(self.netD_loss), step=epoch + 1
+                )
+
+            dump(
+                value=self.history,
+                filename=os.path.join(
+                    os.path.join(config()["path"]["METRCIS_PATH"], "history.pkl")
+                ),
             )
 
-            try:
-                self.saved_checkpoints(
-                    netG_loss=np.mean(self.netG_loss), epoch=epoch + 1
-                )
-            except CustomException as e:
-                print(e)
-                traceback.print_exc()
+            mlflow.pytorch.log_model(self.netG, "netG")
+            mlflow.pytorch.log_model(self.netD, "netD")
 
-            except Exception as e:
-                print(e)
-                traceback.print_exc()
-
-            if (epoch + 1) % self.steps == 0:
-                X, y = next(iter(self.train_dataloader))
-                X = X.to(self.device)
-                y = y.to(self.device)
-
-                predicted_impaint = self.netG(X)
-
-                save_image(
-                    predicted_impaint,
-                    os.path.join(
-                        config()["path"]["SAVE_IMAGE_PATH"],
-                        "image{}.png".format(epoch + 1),
-                    ),
-                    nrow=1,
-                )
-
-            self.history["netG_loss"].append(np.mean(self.netG_loss))
-            self.history["netD_loss"].append(np.mean(self.netD_loss))
-
-        dump(
-            value=self.history,
-            filename=os.path.join(
-                os.path.join(config()["path"]["METRCIS_PATH"], "history.pkl")
-            ),
-        )
+            print(
+                "Metrics in a pickle format is stored in the folder {}".format(
+                    config()["path"]["METRCIS_PATH"]
+                ).capitalize()
+            )
+            print("""mlflow is used, "run the command: mflow ui" """.capitalize())
 
 
 if __name__ == "__main__":
-    trainer = Trainer(epochs=50, device="mps", steps=10)
+    trainer = Trainer(
+        epochs=100,
+        lr=0.0002,
+        beta1=0.5,
+        beta2=0.999,
+        weight_decay=0.0001,
+        momentum=0.9,
+        adversarial_lambda=0.001,
+        pixelwise_lamda=0.999,
+        steps=10,
+        step_size=20,
+        gamma=0.5,
+        device="cuda",
+        adam=True,
+        SGD=False,
+        l1_regularization=False,
+        l2_regularization=False,
+        lr_scheduler=False,
+        MLFlow=True,
+        display=True,
+        is_weight_init=True,
+    )
+
     trainer.train()

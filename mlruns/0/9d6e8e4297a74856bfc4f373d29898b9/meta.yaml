@@ -1,0 +1,16 @@
+artifact_uri: file:///Users/shahmuhammadraditrahman/Desktop/contextEncoder/mlruns/0/9d6e8e4297a74856bfc4f373d29898b9/artifacts
+deleted_time: 1719780345080
+end_time: 1719780065707
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: deleted
+run_id: 9d6e8e4297a74856bfc4f373d29898b9
+run_name: capable-snake-614
+run_uuid: 9d6e8e4297a74856bfc4f373d29898b9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1719780065452
+status: 4
+tags: []
+user_id: shahmuhammadraditrahman
