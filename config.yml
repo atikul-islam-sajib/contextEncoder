@@ -9,7 +9,7 @@ path:
 
 dataloader:
   image_path: "./data/raw/dataset.zip"
-  image_size: 512
+  image_size: 128            # Pape suggested to use 128, try to use different like 256, 512, 1024 as well
   channels: 3
   batch_size: 1
   split_size: 0.30
@@ -24,7 +24,7 @@ trainer:
   momentum: 0.9
   weight_decay: 0.001
   epochs: 100
-  adversarial_lambda: 0.0001
+  adversarial_lambda: 0.001
   pixelwise_lambda: 0.999
   steps: 50
   step_size: 10                # Used for learning rate scheduler
@@ -33,7 +33,7 @@ trainer:
   lr_scheduler: False
   l1_regularization: False
   l2_regularization: False
-  MLFlow: True
+  MLFlow: True                 # To visualize the training process in local - "mlflow ui"
   display: True
   is_weight_init: True
 
