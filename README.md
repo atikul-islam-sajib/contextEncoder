@@ -221,7 +221,7 @@ trainer.train()
 #### Testing the Model
 ```python
 tester = Tester(device="cuda", model="best") # use mps, cpu
-test.test()
+test.plot()
 ```
 
 #### Using MLflow UI Locally
@@ -238,3 +238,6 @@ Contributions to improve this implementation of context Encoder are welcome. Ple
 
 ## License
 Specify the license under which the project is made available (e.g., MIT License).
+
+
+# will updated soon .....
