@@ -19,25 +19,26 @@ trainer:
   adam: True
   SGD: False
   lr: 0.0002
-  beta1: 0.5
-  beta2: 0.999
-  momentum: 0.9
-  weight_decay: 0.001
+  beta1: 0.5                   # Used in the Adam optimizer
+  beta2: 0.999                 # Used in the Adam optimizer
+  momentum: 0.9                # Used for SGD optimizer
+  weight_decay: 0.0001         # Used for Adam optimizer
+  weight_decay: 0.001          # Used for Adam optimizer
   epochs: 100
-  adversarial_lambda: 0.001
-  pixelwise_lambda: 0.999
+  adversarial_lambda: 0.001    # Lmbda value added in the netG
+  pixelwise_lambda: 0.999      # Lmbda value added in the netG
   steps: 50
   step_size: 10                # Used for learning rate scheduler
   gamma: 0.5                   # Used for learning rate scheduler
   device: cuda                 # Can be used "cpu", "mps" as well
-  lr_scheduler: False
+  lr_scheduler: False          # Used StepLR
   l1_regularization: False
   l2_regularization: False
   MLFlow: True                 # To visualize the training process in local - "mlflow ui"
-  display: True
+  display: True                # Show the progress in each epoch
   is_weight_init: True
 
 tester:
   model: None
-  dataloader: None              # Can be "train", "valid" as well
-  device: cuda                  # Can be used "mps" or "cuda" as well
+  dataloader: None             # Can be "train", "valid" as well
+  device: cuda                 # Can be used "mps" or "cuda" as well
