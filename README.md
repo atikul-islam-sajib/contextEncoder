@@ -269,6 +269,3 @@ Contributions to improve this implementation of context Encoder are welcome. Ple
 
 ## License
 Specify the license under which the project is made available (e.g., MIT License).
-
-
-# will updated soon .....
