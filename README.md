@@ -76,7 +76,7 @@ This project is thoughtfully organized to support the development, training, and
 
 ### Dataset Organization for ContextEncoder
 
-The dataset is organized into three categories for ESRGAN. Each category directly contains paired images and their corresponding lower resolution images and higher resolution, stored together to simplify the association between lower resolution and higher resolution images .
+The dataset is organized into three categories for ContextEncoder. Each category directly contains paired images and their corresponding images, stored together to simplify the association images .
 
 ## Directory Structure:
 
