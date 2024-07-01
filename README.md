@@ -1,6 +1,6 @@
 # Context Encoders: Feature Learning by Inpainting
 
-<img src="https://github.com/atikul-islam-sajib/contextEncoder/blob/main/research/artifacts/IMG_0336.jpg" alt="AC-GAN - Medical Image Dataset Generator: Generated Image with labels">
+<img src="https://github.com/atikul-islam-sajib/contextEncoder/blob/main/research/artifacts/IMG_0336.jpg" alt="Context Encoder GAN">
 
 This project provides a complete framework for training and testing a  Context Encoders: Feature Learning by Inpainting Generative Adversarial Network . It includes functionality for data preparation, model training, testing, and inference to enhance feature learning by Inpainting
 
@@ -74,7 +74,7 @@ This project is thoughtfully organized to support the development, training, and
 - **unittest/**
   - Unit tests ensuring code reliability, correctness, and functionality across various project components.
 
-### Dataset Organization for ESRGAN
+### Dataset Organization for ContextEncoder
 
 The dataset is organized into three categories for ESRGAN. Each category directly contains paired images and their corresponding lower resolution images and higher resolution, stored together to simplify the association between lower resolution and higher resolution images .
 
@@ -148,39 +148,39 @@ The project is controlled via a command line interface (CLI) which allows for ru
    ```yaml
 
         dataloader:
-        image_path: "./data/raw/dataset.zip"
-        image_size: 128            # Paper suggested to use 128, try to use different like 256, 512, 1024 as well
-        channels: 3
-        batch_size: 4              # Paper suggested to use 8, try to use different like 1, 16, 32, 64 as well
-        split_size: 0.30
+          image_path: "./data/raw/dataset.zip"
+          image_size: 128            # Paper suggested to use 128, try to use different like 256, 512, 1024 as well
+          channels: 3
+          batch_size: 4              # Paper suggested to use 8, try to use different like 1, 16, 32, 64 as well
+          split_size: 0.30
 
         trainer:
-        name: "trainer"
-        adam: True
-        SGD: False
-        lr: 0.0002
-        beta1: 0.5                   # Used in the Adam optimizer
-        beta2: 0.999                 # Used in the Adam optimizer
-        momentum: 0.9                # Used for SGD optimizer
-        weight_decay: 0.0001         # Used for Adam optimizer
-        epochs: 5
-        adversarial_lambda: 0.001    # Lmbda value added in the netG
-        pixelwise_lambda: 0.999      # Lmbda value added in the netG
-        steps: 100
-        step_size: 10                # Used for learning rate scheduler
-        gamma: 0.5                   # Used for learning rate scheduler
-        device: mps                  # Can be used "cpu", "mps" as well
-        lr_scheduler: False          # Used StepLR
-        l1_regularization: False
-        l2_regularization: False
-        MLFlow: True                 # To visualize the training process in local - "mlflow ui"
-        display: True                # Show the progress in each epoch
-        is_weight_init: True
+          name: "trainer"
+          adam: True
+          SGD: False
+          lr: 0.0002
+          beta1: 0.5                   # Used in the Adam optimizer
+          beta2: 0.999                 # Used in the Adam optimizer
+          momentum: 0.9                # Used for SGD optimizer
+          weight_decay: 0.0001         # Used for Adam optimizer
+          epochs: 5
+          adversarial_lambda: 0.001    # Lmbda value added in the netG
+          pixelwise_lambda: 0.999      # Lmbda value added in the netG
+          steps: 100
+          step_size: 10                # Used for learning rate scheduler
+          gamma: 0.5                   # Used for learning rate scheduler
+          device: mps                  # Can be used "cpu", "mps" as well
+          lr_scheduler: False          # Used StepLR
+          l1_regularization: False
+          l2_regularization: False
+          MLFlow: True                 # To visualize the training process in local - "mlflow ui"
+          display: True                # Show the progress in each epoch
+          is_weight_init: True
 
         tester:
-        model: best                  # Define the model as "best" or select the model from chackpoints
-        dataloader: train            # Can be "train", "valid" as well
-        device: mps                  # Can be used "mps" or "cuda" as well
+          model: best                  # Define the model as "best" or select the model from chackpoints
+          dataloader: train            # Can be "train", "valid" as well
+          device: mps                  # Can be used "mps" or "cuda" as well
 
 ```
 
@@ -224,7 +224,38 @@ tester = Tester(device="cuda", model="best") # use mps, cpu
 test.plot()
 ```
 
-#### Using MLflow UI Locally
+
+### Configuration for MLFlow
+
+1. **Generate a Personal Access Token on DagsHub**:
+   - Log in to [DagsHub](https://dagshub.com).
+   - Go to your user settings and generate a new personal access token under "Personal Access Tokens".
+
+2. **Set environment variables**:
+   Set the following environment variables with your DagsHub credentials:
+   ```bash
+   export MLFLOW_TRACKING_URI="https://dagshub.com/<username>/<repo_name>.mlflow"
+   export MLFLOW_TRACKING_USERNAME="<your_dagshub_username>"
+   export MLFLOW_TRACKING_PASSWORD="<your_dagshub_token>"
+   ```
+
+   Replace `<username>`, `<repo_name>`, `<your_dagshub_username>`, and `<your_dagshub_token>` with your actual DagsHub username, repository name, and personal access token.
+
+### Running the Training Script
+
+To start training and logging the experiments to DagsHub, run the following command:
+
+```bash
+python src/cli.py --train 
+```
+
+### Accessing Experiment Tracking
+
+You can access the MLflow experiment tracking UI hosted on DagsHub using the following link:
+
+[ESRGAN Experiment Tracking on DagsHub](https://dagshub.com/atikul-islam-sajib/contextEncoder/experiments/#/)
+
+### Using MLflow UI Locally
 
 If you prefer to run the MLflow UI locally, use the following command:
 
