@@ -7,9 +7,13 @@ import warnings
 import traceback
 import numpy as np
 from tqdm import tqdm
+from dotenv import load_dotenv
+from dagshub import dagshub_logger
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR
+
+load_dotenv()
 
 warnings.filterwarnings("ignore")
 
@@ -132,6 +136,12 @@ class Trainer:
             self.total_netG_loss = []
             self.total_netD_loss = []
             self.history = {"netG_loss": [], "netD_loss": []}
+
+            os.getenv("MLFLOW_TRACKING_URI")
+            os.getenv("MLFLOW_TRACKING_USERNAME")
+            os.getenv("MLFLOW_TRACKING_PASSWORD")
+
+            mlflow.set_experiment(experiment_name="Context Encoder based GAN".title())
 
     def l1_regularizer(self, model=None, value=0.01):
         if model is not None:

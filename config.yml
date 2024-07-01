@@ -24,7 +24,7 @@ trainer:
   beta2: 0.999                 # Used in the Adam optimizer
   momentum: 0.9                # Used for SGD optimizer
   weight_decay: 0.0001         # Used for Adam optimizer
-  epochs: 5
+  epochs: 500
   adversarial_lambda: 0.001    # Lmbda value added in the netG
   pixelwise_lambda: 0.999      # Lmbda value added in the netG
   steps: 100
